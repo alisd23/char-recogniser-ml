@@ -30,60 +30,66 @@ def max_pool_2x2(x):
   '''
   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-# Examples and predictions (10 classes)
-x = tf.placeholder(tf.float32, shape=[None, IMAGE_SIZE ** 2])
-y = tf.placeholder(tf.float32, shape=[None, CLASSES])
+graph = tf.Graph()
 
-# FIRST LAYER (CONV (ReLU), POOL)
-# Input size [32 x 32 x 1] | Output size [16 x 16 x 32]
-depth_conv1 = 32
+with graph.as_default():
+  # Examples and predictions (10 classes)
+  x = tf.placeholder(tf.float32, shape=[None, IMAGE_SIZE ** 2])
+  y = tf.placeholder(tf.float32, shape=[None, CLASSES])
 
-# [Patch width, Patch height, Input depth, Output depth (no of filters)]
-W_conv1 = weight_variable([5, 5, 1, depth_conv1])
-# Bias variable per filter
-b_conv1 = bias_variable([depth_conv1])
+  # FIRST LAYER (CONV (ReLU), POOL)
+  # Input size [32 x 32 x 1] | Output size [16 x 16 x 32]
+  depth_conv1 = 32
 
-# Reshape Image to [?, 32 width, 32 height, depth]
-# This is the input layer
-x_image = tf.reshape(x, [-1, 32, 32, 1])
+  # [Patch width, Patch height, Input depth, Output depth (no of filters)]
+  W_conv1 = weight_variable([5, 5, 1, depth_conv1])
+  # Bias variable per filter
+  b_conv1 = bias_variable([depth_conv1])
 
-h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-h_pool1 = max_pool_2x2(h_conv1)
+  # Reshape Image to [?, 32 width, 32 height, depth]
+  # This is the input layer
+  x_image = tf.reshape(x, [-1, IMAGE_SIZE, IMAGE_SIZE, 1])
 
-# SECOND LAYER (CONV (ReLU), POOL)
-# Input size [16 x 16 x 32] | Ouptut size [8 x 8 x 64]
-depth_conv2 = 64
+  h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+  h_pool1 = max_pool_2x2(h_conv1)
 
-# [Patch width, Patch height, Input depth, Output depth (no of filters)]
-W_conv2 = weight_variable([5, 5, depth_conv1, depth_conv2])
-b_conv2 = bias_variable([depth_conv2])
+  # SECOND LAYER (CONV (ReLU), POOL)
+  # Input size [16 x 16 x 32] | Ouptut size [8 x 8 x 64]
+  depth_conv2 = 64
 
-h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = max_pool_2x2(h_conv2)
+  # [Patch width, Patch height, Input depth, Output depth (no of filters)]
+  W_conv2 = weight_variable([5, 5, depth_conv1, depth_conv2])
+  b_conv2 = bias_variable([depth_conv2])
 
-# THIRD LAYER (Fully connected - 2048 neurons)
-# Input size [8 x 8 x 64] => [1 x 4096]| Ouptut size [1 x 2048]
-input_size = int((IMAGE_SIZE / 4) * (IMAGE_SIZE / 4) * depth_conv2)
-W_fc1 = weight_variable([input_size, 2048])
-b_fc1 = bias_variable([2048])
+  h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+  h_pool2 = max_pool_2x2(h_conv2)
 
-h_pool2_flat = tf.reshape(h_pool2, [-1, input_size])
-h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+  # THIRD LAYER (Fully connected - 2048 neurons)
+  # Input size [8 x 8 x 64] => [1 x 4096]| Ouptut size [1 x 2048]
+  input_size = int((IMAGE_SIZE / 4) * (IMAGE_SIZE / 4) * depth_conv2)
+  W_fc1 = weight_variable([input_size, 2048])
+  b_fc1 = bias_variable([2048])
 
-# Apply dropout after 3rd layer
-keep_prob = tf.placeholder(tf.float32)
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+  h_pool2_flat = tf.reshape(h_pool2, [-1, input_size])
+  h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
-# READOUT LAYER
-# Input size [1 x 2048] | Ouptut size [1 x 62]
-W_fc2 = weight_variable([2048, CLASSES])
-b_fc2 = bias_variable([CLASSES])
+  # Apply dropout after 3rd layer
+  keep_prob = tf.placeholder(tf.float32)
+  h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
 
-# Predictions
-predictions = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
+  # READOUT LAYER
+  # Input size [1 x 2048] | Ouptut size [1 x 62]
+  W_fc2 = weight_variable([2048, CLASSES])
+  b_fc2 = bias_variable([CLASSES])
+
+  # Predictions
+  predictions = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
 
 def getModel():
   return predictions, x, y, keep_prob
+
+def getGraph():
+  return graph
 
 def getParameters():
   return W_conv1, b_conv1, W_conv2, b_conv2, W_fc1, b_fc1, W_fc2, b_fc2
