@@ -24,11 +24,13 @@ def predict(image):
   }
 
   T_y_probs = tf.nn.softmax(predictions)
-  T_top_3_predictions = tf.nn.top_k(T_y_probs, 3)
+
+  # Get all predictions in order of probability
+  T_top_predictions = tf.nn.top_k(T_y_probs, 62)
 
   with tf.Session(graph=graph) as session:
-    y_probs, top_3 = session.run([T_y_probs, T_top_3_predictions], feed_dict=feed)
-    values, indices = top_3
+    y_probs, top = session.run([T_y_probs, T_top_predictions], feed_dict=feed)
+    values, indices = top
 
     result = []
     for confidence, index in zip(values[0], indices[0]):
