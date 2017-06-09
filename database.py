@@ -36,6 +36,7 @@ def connect():
   global client, db
   client = MongoClient(HOST, PORT)
   db = client['char-recogniser']
+  return db
 
 def processExample(example):
   y = np.zeros(CLASSES)
