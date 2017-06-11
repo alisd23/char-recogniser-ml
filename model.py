@@ -3,6 +3,7 @@ from classes import codeToClass, classToCode
 
 CLASSES = len(codeToClass.keys())
 IMAGE_SIZE = 32
+FILTER_SIZE = 5
 
 # Create a new WEIGHT variable with random variation
 def weight_variable(shape):
@@ -42,7 +43,7 @@ with graph.as_default():
   depth_conv1 = 32
 
   # [Patch width, Patch height, Input depth, Output depth (no of filters)]
-  W_conv1 = weight_variable([5, 5, 1, depth_conv1])
+  W_conv1 = weight_variable([FILTER_SIZE, FILTER_SIZE, 1, depth_conv1])
   # Bias variable per filter
   b_conv1 = bias_variable([depth_conv1])
 
@@ -58,7 +59,7 @@ with graph.as_default():
   depth_conv2 = 64
 
   # [Patch width, Patch height, Input depth, Output depth (no of filters)]
-  W_conv2 = weight_variable([5, 5, depth_conv1, depth_conv2])
+  W_conv2 = weight_variable([FILTER_SIZE, FILTER_SIZE, depth_conv1, depth_conv2])
   b_conv2 = bias_variable([depth_conv2])
 
   h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)

@@ -1,6 +1,7 @@
 import cherrypy
 from predict import predict
 from database import connect
+from utils import volumeToPixels
 import os
 
 port = os.environ.get('PORT')
@@ -20,12 +21,9 @@ class Root():
     image = data['image']
     predictions, activations = predict(image)
 
-    print(len(activations))
-    print(len(activations[0]))
-    print(len(activations[0][0]))
     return {
       'predictions': predictions,
-      # 'activations': activations
+      'activations': volumeToPixels(activations)
     }
 
 if __name__ == '__main__':

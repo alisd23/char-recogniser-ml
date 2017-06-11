@@ -1,41 +1,20 @@
+import numpy as np
 from database import connect, getRecentRun
+from utils import volumeToPixels
 
 db = connect()
 
 params = getRecentRun()
-conv1 = params["parameters"]["W_conv1"]
 
-def volumeToPixels()
+# Remove single dimensional entries (input has shape [5, 5, 1, 32])
+conv1 = np.array(params["parameters"]["W_conv1"]).squeeze().tolist()
 
-noOfFilters = len(conv1[0][0][0])
-spatialSize = len(conv1[0])
-filters = []
-allPixels = []
-
-for i in range(noOfFilters):
-  for row_i in range(spatialSize):
-    for col_i in range(spatialSize):
-      allPixels.append(conv1[col_i][row_i][0][i])
-
-min_val = min(allPixels)
-max_val = max(allPixels)
-
-def normalise(value):
-  v = (value - min_val) / (max_val - min_val)
-  return v * 255
-
-for i in range(noOfFilters):
-  filter = []
-  for row_i in range(spatialSize):
-    for col_i in range(spatialSize):
-      # store pixels left to right (by row)
-      filter.append(normalise(conv1[col_i][row_i][0][i]))
-  filters.append(filter)
+filters_1 = volumeToPixels(conv1)
 
 db["values"].insert_one({
   "top1": params["top_1"],
   "top3": params["top_3"],
-  "conv1": filters
+  "conv1": filters_1
 })
 
-print('Conv layer 1 - {} filters saved to DB'.format(len(filters)))
+print('Conv filters saved to DB')

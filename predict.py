@@ -30,7 +30,10 @@ def predict(image):
   T_top_predictions = tf.nn.top_k(T_y_probs, 62)
 
   with tf.Session(graph=graph) as session:
-    y_probs, top, activations = session.run([T_y_probs, T_top_predictions, conv1_activations], feed_dict=feed)
+    y_probs, top, activations = session.run(
+      [T_y_probs, T_top_predictions, conv1_activations],
+      feed_dict=feed
+    )
     values, indices = top
 
     result = []
@@ -42,4 +45,4 @@ def predict(image):
 
     session.close()
 
-    return result, activations[0]
+    return result, activations.tolist()[0]
