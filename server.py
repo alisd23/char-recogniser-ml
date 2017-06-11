@@ -18,9 +18,14 @@ class Root():
   def predict(self):
     data = cherrypy.request.json
     image = data['image']
-    predictions = predict(image)
+    predictions, activations = predict(image)
+
+    print(len(activations))
+    print(len(activations[0]))
+    print(len(activations[0][0]))
     return {
-      'predictions': predictions
+      'predictions': predictions,
+      # 'activations': activations
     }
 
 if __name__ == '__main__':

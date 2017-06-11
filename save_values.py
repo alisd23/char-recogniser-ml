@@ -5,6 +5,8 @@ db = connect()
 params = getRecentRun()
 conv1 = params["parameters"]["W_conv1"]
 
+def volumeToPixels()
+
 noOfFilters = len(conv1[0][0][0])
 spatialSize = len(conv1[0])
 filters = []

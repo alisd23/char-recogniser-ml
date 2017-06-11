@@ -1,5 +1,5 @@
 from database import connect, getRecentRun, getRandomExample, processExample
-from model import getModel, getParameters, getGraph
+from model import getModel, getParameters, getGraph, getActivations
 from classes import classToCode
 import tensorflow as tf
 
@@ -8,6 +8,7 @@ def predict(image):
 
   predictions, x, y, keep_prob = getModel()
   graph = getGraph()
+  conv1_activations = getActivations()
   W_conv1, b_conv1, W_conv2, b_conv2, W_fc1, b_fc1, W_fc2, b_fc2 = getParameters()
 
   feed = {
@@ -29,7 +30,7 @@ def predict(image):
   T_top_predictions = tf.nn.top_k(T_y_probs, 62)
 
   with tf.Session(graph=graph) as session:
-    y_probs, top = session.run([T_y_probs, T_top_predictions], feed_dict=feed)
+    y_probs, top, activations = session.run([T_y_probs, T_top_predictions, conv1_activations], feed_dict=feed)
     values, indices = top
 
     result = []
@@ -40,4 +41,5 @@ def predict(image):
       })
 
     session.close()
-    return result
+
+    return result, activations[0]
