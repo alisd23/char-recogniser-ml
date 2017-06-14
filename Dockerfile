@@ -10,6 +10,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=9000 HOST=0.0.0.0
+ENV PORT=9001 HOST=0.0.0.0 DB_HOST=mongo
 
 ENTRYPOINT ["python", "server.py"]

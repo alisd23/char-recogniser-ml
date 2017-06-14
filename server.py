@@ -7,7 +7,7 @@ import os
 port = os.environ.get('PORT')
 host = os.environ.get('HOST')
 DEFAULT_PORT = 9001
-DEFAULT_HOST = 'localhost'
+DEFAULT_HOST = '127.0.0.1'
 
 cherrypy.config.update({
   'server.socket_port': int(port) if port else DEFAULT_PORT,

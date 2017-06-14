@@ -2,14 +2,17 @@ from pymongo import MongoClient
 from classes import codeToClass, classToCode
 import numpy as np
 import time
+import os
 import json
 import gridfs
 
 CLASSES = len(codeToClass.keys())
 SPLIT_VALUE = 0.8
 
-HOST = 'localhost'
-PORT = 27017
+DEFAULT_HOST = 'localhost'
+db_host = os.environ.get('DB_HOST') or DEFAULT_HOST
+
+db_port = 27017
 
 client = None
 db = None
@@ -34,7 +37,7 @@ class Set:
 
 def connect():
   global client, db
-  client = MongoClient(HOST, PORT)
+  client = MongoClient(db_host, db_port)
   db = client['char-recogniser']
   return db
 
