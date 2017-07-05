@@ -56,7 +56,7 @@ with graph.as_default():
 
   # SECOND LAYER (CONV (ReLU), POOL)
   # Input size [16 x 16 x 32] | Ouptut size [8 x 8 x 64]
-  depth_conv2 = 64
+  depth_conv2 = 32
 
   # [Patch width, Patch height, Input depth, Output depth (no of filters)]
   W_conv2 = weight_variable([FILTER_SIZE, FILTER_SIZE, depth_conv1, depth_conv2])
@@ -65,11 +65,11 @@ with graph.as_default():
   h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
   h_pool2 = max_pool_2x2(h_conv2)
 
-  # THIRD LAYER (Fully connected - 2048 neurons)
+  # THIRD LAYER (Fully connected - 4096 neurons)
   # Input size [8 x 8 x 64] => [1 x 4096]| Ouptut size [1 x 2048]
   input_size = int((IMAGE_SIZE / 4) * (IMAGE_SIZE / 4) * depth_conv2)
-  W_fc1 = weight_variable([input_size, 2048])
-  b_fc1 = bias_variable([2048])
+  W_fc1 = weight_variable([input_size, 1024])
+  b_fc1 = bias_variable([1024])
 
   h_pool2_flat = tf.reshape(h_pool2, [-1, input_size])
   h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
@@ -80,7 +80,7 @@ with graph.as_default():
 
   # READOUT LAYER
   # Input size [1 x 2048] | Ouptut size [1 x 62]
-  W_fc2 = weight_variable([2048, CLASSES])
+  W_fc2 = weight_variable([1024, CLASSES])
   b_fc2 = bias_variable([CLASSES])
 
   # Predictions
